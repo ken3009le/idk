@@ -1,0 +1,65 @@
+  <h3>Chỉnh sửa sản phẩm</h3>
+  <input type="text" id="editName" placeholder="Tên sản phẩm" style="margin:5px; padding:5px; width:100%;">
+  <input type="text" id="editPrice" placeholder="Giá sản phẩm (VND)" style="margin:5px; padding:5px; width:100%;">
+  <input type="text" id="editImageLink" placeholder="Link ảnh sản phẩm" style="margin:5px; padding:5px; width:100%;">
+  <textarea id="editInfo" placeholder="Mô tả sản phẩm" rows="4" style="width:100%; margin:5px;"></textarea>
+  <input type="file" id="editImageFile" accept="image/*" style="margin:5px;">
+  <button class="button" onclick="saveProduct()">💾 Lưu sản phẩm</button>
+</div>
+
+<script>
+let products = [];
+
+function toggleEditor() {
+  const section = document.getElementById("editProductSection");
+  section.style.display = section.style.display === "none" ? "block" : "none";
+}
+
+function saveProduct() {
+  const name = document.getElementById("editName").value;
+  const price = document.getElementById("editPrice").value;
+  const imageLink = document.getElementById("editImageLink").value;
+  const info = document.getElementById("editInfo").value;
+  const imageFile = document.getElementById("editImageFile").files[0];
+
+  let imageUrl = imageLink;
+
+  if (imageFile) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      imageUrl = e.target.result;
+      storeProduct(name, price, imageUrl, info);
+    }
+    reader.readAsDataURL(imageFile);
+  } else {
+    storeProduct(name, price, imageUrl, info);
+  }
+}
+
+function storeProduct(name, price, imageUrl, info) {
+  if (!name || !price || !imageUrl || !info) {
+    alert("Vui lòng điền đầy đủ thông tin sản phẩm");
+    return;
+  }
+  const product = { name, price, image: imageUrl, info };
+  products.push(product);
+  localStorage.setItem("logs_sanpham.json", JSON.stringify(products));
+  alert("✅ Sản phẩm đã được lưu vào localstorage");
+  displayProduct(product);
+}
+
+function displayProduct(p) {
+  const container = document.querySelector(".product-container");
+  const card = document.createElement("div");
+  card.className = "product-card";
+  card.innerHTML = `
+    <div class="product-details">
+      <h3>${p.name}</h3>
+      <img src="${p.image}" alt="${p.name}" style="max-width: 100%; border-radius: 5px;">
+      <p>${p.info}</p>
+      <p class="price">Giá: ${parseInt(p.price).toLocaleString()} VND</p>
+    </div>
+  `;
+  container.appendChild(card);
+}
+</script>
